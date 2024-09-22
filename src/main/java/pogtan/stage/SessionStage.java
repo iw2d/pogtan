@@ -18,6 +18,10 @@ public abstract class SessionStage extends ChatStage {
         this.session = session;
     }
 
+    public final Session getSession() {
+        return session;
+    }
+
     @Override
     public void broadcastPacket(SendPacket packet) {
         session.broadcastPacket(packet);
@@ -46,7 +50,7 @@ public abstract class SessionStage extends ChatStage {
         // CUser::SetUser
         packet.encodeString(user.getName());
         packet.encodeByte(0);
-        packet.encodeShort(0);
+        packet.encodeShort(user.getLevel());
         packet.encodeInt(0);
         // ~CUser::SetUser
         return packet;

@@ -69,9 +69,11 @@ public final class ChannelStage extends ChatStage {
                 packet.decodeByte();
                 packet.decodeByte();
                 for (User user : users) {
-                    packet.decodeByte(); // LastSelBomber
+                    user.setLastSelectedBomber(packet.decodeByte()); // LastSelBomber
                 }
-                final Session session = new Session(channel, 1, name, pass);
+                final Session session = new Session(channel, 0, name, pass);
+                session.getSlots().getLast().setUser(new User(999, "fake"));
+                session.getSlots().getLast().setReady(true);
                 if (!session.addClient(client, users)) {
                     log.error("Failed to add user to session");
                     return;
@@ -117,6 +119,16 @@ public final class ChannelStage extends ChatStage {
         return packet;
     }
 
+    public static SendPacket inviteUser(int mapId, String inviterName, String sessionName) {
+        // CChannelStage::OnInviteUser
+        final SendPacket packet = SendPacket.of(SendHeader.INVITE_USER);
+        packet.encodeShort(mapId);
+        packet.encodeInt(0); // inviter id? ignored
+        packet.encodeString(inviterName);
+        packet.encodeString(sessionName);
+        return packet;
+    }
+
     public static SendPacket createSessionResult(int resultType, Session session) {
         // CChannelStage::OnCreateSessionResult
         // 0 : success
@@ -127,10 +139,20 @@ public final class ChannelStage extends ChatStage {
         final SendPacket packet = SendPacket.of(SendHeader.CREATE_SESSION_RESULT);
         packet.encodeByte(resultType);
         if (session != null) {
-            packet.encodeShort(123);
+            packet.encodeShort(session.getId());
             packet.encodeInt(0);
             packet.encodeByte(0);
         }
+        return packet;
+    }
+
+    public static SendPacket joinSessionResult(int resultType) {
+        // CChannelStage::OnJoinSessionResult
+        // 0 : success
+        // 1 : cannot join session
+        // 2 : same as 1?
+        final SendPacket packet = SendPacket.of(SendHeader.CREATE_SESSION_RESULT);
+        packet.encodeByte(resultType);
         return packet;
     }
 }

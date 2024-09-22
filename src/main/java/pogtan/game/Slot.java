@@ -40,11 +40,31 @@ public final class Slot {
     }
 
     public void setChiefPlayer(boolean set) {
-        state[0] |= 0x2;
+        if (set) {
+            state[0] |= 0x2;
+        } else {
+            state[0] ^= 0x2;
+        }
     }
 
     public boolean isReady() {
-        return (state[0] & 0x1C) != 0;
+        return (state[0] & 0x8) != 0;
+    }
+
+    public void setReady(boolean set) {
+        if (set) {
+            state[0] |= 0x8;
+        } else {
+            state[0] ^= 0x8;
+        }
+    }
+
+    public int getBomber() {
+        return state[1];
+    }
+
+    public void setBomber(int bomber) {
+        state[1] = (byte) bomber;
     }
 
     public int getTeam() {

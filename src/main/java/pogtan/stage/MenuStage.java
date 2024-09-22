@@ -87,10 +87,10 @@ public final class MenuStage extends Stage {
             // CUser::SetUser
             packet.encodeString(user.getName());
             packet.encodeByte(0);
-            packet.encodeShort(0);
+            packet.encodeShort(user.getLevel());
             packet.encodeInt(0);
             // ~CUser::SetUser
-            packet.encodeInt(0xBEEF);
+            packet.encodeInt(0);
         }
         return packet;
     }

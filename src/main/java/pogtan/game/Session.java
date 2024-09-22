@@ -14,6 +14,7 @@ public final class Session {
     private final String pass;
     private final List<Slot> slots;
     private final ConcurrentHashMap<Client, List<User>> clients;
+    private int map;
 
     public Session(Channel channel, int id, String name, String pass) {
         this.channel = channel;
@@ -54,10 +55,24 @@ public final class Session {
         return slots;
     }
 
+    public List<Slot> getUserSlots() {
+        return slots.stream()
+                .filter(slot -> slot.getUser() != null)
+                .toList();
+    }
+
     public List<Slot> getOpenSlots() {
         return slots.stream()
                 .filter(slot -> slot.getUser() == null && !slot.isClosed())
                 .toList();
+    }
+
+    public int getMap() {
+        return map;
+    }
+
+    public void setMap(int map) {
+        this.map = map;
     }
 
     public void broadcastPacket(SendPacket packet) {
@@ -79,6 +94,7 @@ public final class Session {
             final User user = users.get(i);
             final Slot slot = openSlots.get(i);
             slot.setUser(user);
+            slot.setBomber(user.getLastSelectedBomber());
             broadcastPacket(SessionStage.setPlayer(slot.getIndex(), slot.getUser(), slot.getState(), true));
         }
         // Add client

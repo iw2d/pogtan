@@ -40,7 +40,6 @@ public abstract class ChatStage extends Stage {
             case WHISPER_MESSAGE -> {
                 // CChatStage::HandleChatMsg
             }
-
             default -> {
                 super.handlePacket(header, packet);
             }

@@ -48,6 +48,7 @@ public abstract class Stage {
                 client.setStage(new ChannelStage(client, users, channel));
                 channel.getUserStorage().add(client, users);
                 client.write(enterChannel());
+                Server.addClient(migrationKey, client);
             }
             case ESTIMATE_RTTP_REQUEST -> {
                 // CMainSystem::SendEstimateRTTPacket

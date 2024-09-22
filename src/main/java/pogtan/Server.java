@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pogtan.game.Channel;
 import pogtan.game.ChannelType;
 import pogtan.game.User;
+import pogtan.server.Client;
 import pogtan.server.TcpAcceptor;
 import pogtan.server.UdpAcceptor;
 import pogtan.util.Tuple;
@@ -18,6 +19,7 @@ public final class Server {
     private static final List<Channel> channels = List.of(
             new Channel(1, "TEST", ChannelType.FREE_CHANNEL)
     );
+    private static final ConcurrentHashMap<Integer, Client> connections = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<Integer, Tuple<List<User>, Channel>> migrations = new ConcurrentHashMap<>();
 
     public static List<Channel> getChannels() {
@@ -29,6 +31,16 @@ public final class Server {
             return Optional.empty();
         }
         return Optional.of(channels.get(index));
+    }
+
+    public static void addClient(int userId, Client client) {
+        connections.put(userId, client);
+    }
+
+    // TODO remove client
+
+    public static Optional<Client> getClient(int userId) {
+        return Optional.ofNullable(connections.get(userId));
     }
 
     public static void submitMigration(List<User> users, Channel channel) {
