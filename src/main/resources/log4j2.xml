@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration shutdownHook="disable">
+    <Appenders>
+        <Console name="ConsoleLogger" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%level] %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="pogtan" level="debug" additivity="false">
+            <AppenderRef ref="ConsoleLogger"/>
+        </Logger>
+
+        <Logger name="io.netty" level="error">
+            <AppenderRef ref="ConsoleLogger"/>
+        </Logger>
+
+        <Root level="error">
+            <AppenderRef ref="ConsoleLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
