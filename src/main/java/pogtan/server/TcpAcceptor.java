@@ -84,7 +84,9 @@ public final class TcpAcceptor extends SocketAcceptor {
                 return;
             }
             final byte[] data = packet.getData();
-            log.debug("[In]  | {} ({}/{}) | {}", header, header.getValue(), Util.formatHex(header.getValue()), Util.readableByteArray(data));
+            if (header != ReceiveHeader.ESTIMATE_RTTP_REQUEST) {
+                log.debug("[In]  | {} ({}/{}) | {}", header, header.getValue(), Util.formatHex(header.getValue()), Util.readableByteArray(data));
+            }
             c.getStage().handlePacket(header, packet);
         }
 

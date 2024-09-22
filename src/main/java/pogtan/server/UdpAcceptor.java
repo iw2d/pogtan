@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pogtan.util.Crc32;
+import pogtan.util.Util;
 
 public final class UdpAcceptor extends SocketAcceptor {
     private static final Logger log = LogManager.getLogger(UdpAcceptor.class);
@@ -41,7 +42,8 @@ public final class UdpAcceptor extends SocketAcceptor {
             in.readByte(); // size
             in.readInt(); // CRC
 
-            switch (in.readByte()) {
+            final byte header = in.readByte();
+            switch (header) {
                 case 0 -> {
                     final ByteBuf out = Unpooled.buffer(5 + 1 + 4); // header + data + crc
                     out.writeByte(5 + 1);
@@ -49,6 +51,9 @@ public final class UdpAcceptor extends SocketAcceptor {
                     out.writeByte(2); // op
                     out.writeInt(Crc32.updateCrc(0, out));
                     ctx.writeAndFlush(new DatagramPacket(out, packet.sender()));
+                }
+                default -> {
+                    log.error("Unhandled UDP header {}/{}", header, Util.formatHex(header));
                 }
             }
         }

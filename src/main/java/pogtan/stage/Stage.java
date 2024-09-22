@@ -30,20 +30,23 @@ public abstract class Stage {
             case CONNECT_TO_CHANNEL_REQUEST -> {
                 // CFrontStage::OnResConnectToSvr
                 final int size = packet.decodeByte();
-                final List<User> users = new ArrayList<>();
+                final List<User> userCheck = new ArrayList<>();
                 for (int i = 0; i < size; i++) {
                     final String name = packet.decodeString();
                     final int id = packet.decodeInt();
                     packet.decodeInt();
-                    users.add(new User(id, name));
+                    userCheck.add(new User(id, name));
                 }
-                final int migrationKey = users.get(0).getId();
+                final int migrationKey = userCheck.get(0).getId();
                 final Optional<Tuple<List<User>, Channel>> migrationResult = Server.completeMigration(migrationKey);
                 if (migrationResult.isEmpty()) {
                     log.error("Could not complete migration with key : {}", migrationKey);
                     return;
                 }
-                client.setStage(new ChannelStage(client, migrationResult.get().getLeft(), migrationResult.get().getRight()));
+                final List<User> users = migrationResult.get().getLeft();
+                final Channel channel = migrationResult.get().getRight();
+                client.setStage(new ChannelStage(client, users, channel));
+                channel.getUserStorage().add(client, users);
                 client.write(enterChannel());
             }
             case ESTIMATE_RTTP_REQUEST -> {
@@ -73,10 +76,10 @@ public abstract class Stage {
         return packet;
     }
 
-    public static SendPacket userSimpleInfo(List<User> users) {
+    public static SendPacket userSimpleInfo(int page, List<User> users) {
         final SendPacket packet = SendPacket.of(SendHeader.USER_SIMPLE_INFO);
         // CUserMap::OnUserSimpleInfo
-        packet.encodeShort(0);
+        packet.encodeShort(page);
         packet.encodeByte(users.size());
         for (User user : users) {
             user.encode(packet);

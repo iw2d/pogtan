@@ -28,8 +28,19 @@ public abstract class ChatStage extends Stage {
             case CHAT_MESSAGE -> {
                 // CChatStage::HandleChatMsg
                 final String message = packet.decodeString();
-                broadcastPacket(chatMessage(message));
+                final String formattedMessage = String.format("%s : %s",
+                        String.join(" & ", users.stream().map(User::getName).toList()),
+                        message
+                );
+                broadcastPacket(chatMessage(formattedMessage));
             }
+            case COMMAND_MESSAGE -> {
+                // CChatStage::HandleSpecialCmdMsg
+            }
+            case WHISPER_MESSAGE -> {
+                // CChatStage::HandleChatMsg
+            }
+
             default -> {
                 super.handlePacket(header, packet);
             }
